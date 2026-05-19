@@ -1,0 +1,657 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Stampfree · Reporting</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Condensed:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #f7f6f3;
+    --surface: #ffffff;
+    --surface2: #f0ede8;
+    --border: rgba(0,0,0,0.10);
+    --border2: rgba(0,0,0,0.18);
+    --text: #1a1918;
+    --text2: #5a5753;
+    --text3: #9a9793;
+    --purple: #7F77DD;
+    --purple-light: #EEEDFE;
+    --purple-dark: #3C3489;
+    --coral: #D85A30;
+    --coral-light: #FAECE7;
+    --coral-dark: #993C1D;
+    --amber-light: #FAEEDA;
+    --amber-dark: #854F0B;
+    --radius: 10px;
+    --radius-sm: 6px;
+  }
+
+  body {
+    font-family: 'IBM Plex Sans Condensed', sans-serif;
+    font-size: 15px;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.5;
+    min-height: 100vh;
+  }
+
+  .page {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 2.5rem 2rem 4rem;
+  }
+
+  /* Header */
+  .header {
+    margin-bottom: 2rem;
+    padding-bottom: 1.5rem;
+    border-bottom: 0.5px solid var(--border);
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 1rem;
+  }
+  .header-eyebrow {
+    font-size: 11px;
+    letter-spacing: 0.09em;
+    text-transform: uppercase;
+    color: var(--text3);
+    margin-bottom: 4px;
+  }
+  .header-title {
+    font-family: 'IBM Plex Sans Condensed', sans-serif;
+    font-size: 28px;
+    font-weight: 400;
+    color: var(--text);
+    letter-spacing: -0.3px;
+  }
+  .header-logo {
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--text3);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .logo-mark {
+    width: 24px;
+    height: 24px;
+    background: var(--purple);
+    border-radius: 5px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .logo-mark span {
+    color: white;
+    font-size: 11px;
+    font-weight: 500;
+  }
+
+  /* Tabs */
+  .tabs {
+    display: flex;
+    gap: 0;
+    margin-bottom: 1.75rem;
+    border-bottom: 1px solid var(--border);
+  }
+  .tab {
+    font-size: 13px;
+    padding: 9px 18px;
+    cursor: pointer;
+    color: var(--text2);
+    border-bottom: 2px solid transparent;
+    margin-bottom: -1px;
+    transition: color 0.15s;
+    white-space: nowrap;
+    user-select: none;
+  }
+  .tab:hover { color: var(--text); }
+  .tab.active {
+    color: var(--text);
+    border-bottom-color: var(--purple);
+    font-weight: 500;
+  }
+
+  .pane { display: none; }
+  .pane.active { display: block; }
+
+  /* Pane header */
+  .pane-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+    flex-wrap: wrap;
+  }
+  .pane-title { font-size: 15px; font-weight: 500; color: var(--text); margin-bottom: 3px; }
+  .pane-sub { font-size: 12px; color: var(--text3); }
+
+  .refresh-btn {
+    font-size: 12px;
+    color: var(--text2);
+    background: var(--surface);
+    border: 1px solid var(--border2);
+    border-radius: var(--radius-sm);
+    padding: 7px 14px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    transition: background 0.15s;
+    flex-shrink: 0;
+  }
+  .refresh-btn:hover { background: var(--surface2); }
+  #file-input { display: none; }
+
+  /* Metric cards */
+  .metrics {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    margin-bottom: 1.25rem;
+  }
+  .metric {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 16px 18px;
+  }
+  .m-label { font-size: 12px; color: var(--text2); margin-bottom: 6px; }
+  .m-val { font-size: 30px; font-weight: 500; color: var(--text); line-height: 1; font-family: 'IBM Plex Sans Condensed', sans-serif; }
+  .m-sub { font-size: 12px; color: var(--text3); margin-top: 5px; }
+
+  /* Two col */
+  .two-col {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+    margin-bottom: 14px;
+  }
+
+  /* Card */
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 1.1rem 1.25rem;
+    margin-bottom: 14px;
+  }
+  .card:last-child { margin-bottom: 0; }
+  .card-label {
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: 0.09em;
+    text-transform: uppercase;
+    color: var(--text3);
+    margin-bottom: 14px;
+  }
+
+  /* Bar chart */
+  .legend { display: flex; gap: 14px; margin-bottom: 12px; }
+  .l-item { display: flex; align-items: center; gap: 5px; font-size: 11px; color: var(--text2); }
+  .l-dot { width: 10px; height: 5px; border-radius: 2px; }
+
+  .bar-row { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+  .b-label { width: 115px; font-size: 12px; color: var(--text2); flex-shrink: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .b-track { flex: 1; display: flex; flex-direction: column; gap: 3px; }
+  .b-bar { height: 6px; border-radius: 3px; min-width: 2px; }
+  .b-count { font-size: 12px; font-weight: 500; color: var(--text); width: 20px; text-align: right; }
+
+  /* Quotes */
+  .q-block {
+    border-left: 2px solid var(--border2);
+    padding: 7px 12px;
+    margin-bottom: 9px;
+  }
+  .q-block:last-child { margin-bottom: 0; }
+  .q-text {
+    font-family: 'IBM Plex Sans Condensed', sans-serif;
+    font-style: italic;
+    font-size: 14px;
+    color: var(--text);
+    line-height: 1.5;
+    margin-bottom: 4px;
+  }
+  .q-meta { font-size: 11px; color: var(--text3); }
+
+  /* Journey flow */
+  .flow-wrap { display: flex; align-items: stretch; gap: 0; }
+  .f-step { flex: 1; }
+  .f-box {
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 10px;
+    background: var(--surface);
+    height: 100%;
+  }
+  .f-box.pain { background: var(--coral-light); border-color: #F0997B; }
+  .f-num { font-size: 10px; color: var(--text3); margin-bottom: 3px; }
+  .f-title { font-size: 12px; font-weight: 500; color: var(--text); margin-bottom: 3px; line-height: 1.3; }
+  .f-desc { font-size: 11px; color: var(--text2); line-height: 1.4; }
+  .pain .f-num, .pain .f-desc { color: var(--coral); }
+  .pain .f-title { color: var(--coral-dark); }
+  .f-arr {
+    display: flex;
+    align-items: center;
+    padding: 0 4px;
+    color: var(--text3);
+    font-size: 14px;
+    flex-shrink: 0;
+  }
+  .flow-note { font-size: 11px; color: var(--text3); margin-top: 8px; }
+
+  /* Opps table */
+  .opp-row {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .opp-row:last-child { border-bottom: none; padding-bottom: 0; }
+  .opp-co { font-size: 13px; font-weight: 500; color: var(--text); width: 115px; flex-shrink: 0; padding-top: 1px; }
+  .opp-issue { font-size: 12px; color: var(--text2); flex: 1; line-height: 1.5; }
+  .opp-tag { font-size: 11px; padding: 2px 9px; border-radius: 4px; flex-shrink: 0; margin-top: 1px; }
+  .tag-h { background: var(--coral-light); color: var(--coral-dark); }
+  .tag-m { background: var(--amber-light); color: var(--amber-dark); }
+
+  /* Methodology note */
+  .note {
+    font-size: 12px;
+    color: var(--text3);
+    line-height: 1.6;
+    padding: 10px 14px;
+    background: var(--surface2);
+    border-radius: var(--radius-sm);
+    margin-top: 14px;
+  }
+
+  /* Template tab */
+  .template-wrap { display: flex; flex-direction: column; gap: 12px; }
+  .t-card {
+    background: var(--surface);
+    border: 1px dashed var(--border2);
+    border-radius: var(--radius);
+    padding: 1.1rem 1.25rem;
+  }
+  .t-step {
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: 0.09em;
+    text-transform: uppercase;
+    color: var(--purple);
+    margin-bottom: 5px;
+  }
+  .t-title { font-size: 13px; font-weight: 500; color: var(--text); margin-bottom: 6px; }
+  .t-desc { font-size: 12px; color: var(--text2); line-height: 1.6; }
+  .t-tag {
+    display: inline-block;
+    font-size: 11px;
+    padding: 2px 9px;
+    border-radius: 4px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    color: var(--text2);
+    margin: 6px 4px 0 0;
+  }
+  code {
+    font-family: monospace;
+    font-size: 12px;
+    background: var(--surface2);
+    padding: 1px 5px;
+    border-radius: 3px;
+    color: var(--text);
+  }
+
+  /* Arrow svg */
+  .arrow { display: flex; align-items: center; padding: 0 3px; }
+  .arrow svg { width: 14px; height: 14px; stroke: var(--text3); fill: none; }
+</style>
+</head>
+<body>
+<nav style="display:flex;align-items:center;gap:0;padding:0 2rem;background:#fff;border-bottom:1px solid rgba(0,0,0,0.09);font-family:'DM Sans',sans-serif;font-size:13px;">
+  <span style="font-weight:500;color:#111010;padding:14px 20px 14px 0;margin-right:8px;border-right:1px solid rgba(0,0,0,0.09);">stampfree.ai</span>
+  <a href="stampfree_reporting.html" style="padding:14px 16px;color:#7F77DD;text-decoration:none;border-bottom:2px solid #7F77DD;font-weight:500;">Reporting</a>
+  <a href="stampfree_audit.html" style="padding:14px 16px;color:#5a5753;text-decoration:none;border-bottom:2px solid transparent;">Audit</a>
+</nav>
+<div class="page">
+
+  <div class="header">
+    <div>
+      <p class="header-eyebrow">Internal reporting</p>
+      <h1 class="header-title">Reporting</h1>
+    </div>
+    <div class="header-logo">
+      <div class="logo-mark"><span>sf</span></div>
+      stampfree.ai
+    </div>
+  </div>
+
+  <div class="tabs">
+    <div class="tab active" onclick="switchTab('audit')">Trustpilot audit — companies similar to Rugs Direct</div>
+    <div class="tab" onclick="switchTab('template')">+ New audit</div>
+  </div>
+
+  <!-- AUDIT PANE -->
+  <div class="pane active" id="pane-audit">
+    <div class="pane-header">
+      <div>
+        <p class="pane-title">UK homeware retailers — returns pain audit</p>
+        <p class="pane-sub" id="dash-sub">Trustpilot · 9 companies · 1–3 star · Apr–May 2026</p>
+      </div>
+    </div>
+
+    <div class="metrics">
+      <div class="metric">
+        <div class="m-label">Reviews collected</div>
+        <div class="m-val" id="m-total">80</div>
+        <div class="m-sub" id="m-companies">9 retailers</div>
+      </div>
+      <div class="metric">
+        <div class="m-label">Mention returns / refund</div>
+        <div class="m-val" id="m-returns">32</div>
+        <div class="m-sub" id="m-returns-pct">40% of all reviews</div>
+      </div>
+      <div class="metric">
+        <div class="m-label">Process friction</div>
+        <div class="m-val" id="m-process">23</div>
+        <div class="m-sub">label, instructions, portal</div>
+      </div>
+    </div>
+
+    <div class="two-col">
+      <div class="card" style="margin-bottom:0;">
+        <div class="card-label">Returns mentions by company</div>
+        <div class="legend">
+          <div class="l-item"><div class="l-dot" style="background:#7F77DD;"></div>returns / refund</div>
+          <div class="l-item"><div class="l-dot" style="background:#D85A30;"></div>process friction</div>
+        </div>
+        <div id="bar-chart"></div>
+      </div>
+
+      <div class="card" style="margin-bottom:0;">
+        <div class="card-label">What customers are saying</div>
+        <div class="q-block">
+          <p class="q-text">"I have asked 3 times for instructions and a label with no reply."</p>
+          <p class="q-meta">Rugette · ★1 · May 2026</p>
+        </div>
+        <div class="q-block">
+          <p class="q-text">"No delivery slip, had to ask how to return. Fill in long form and pay to return."</p>
+          <p class="q-meta">Homescapes · ★1 · May 2026</p>
+        </div>
+        <div class="q-block">
+          <p class="q-text">"They refuse return postage despite the rug literally falling apart."</p>
+          <p class="q-meta">Natural Rug Store · ★1 · May 2026</p>
+        </div>
+        <div class="q-block">
+          <p class="q-text">"Cox &amp; Cox require 'permission' to return — then offer a £25 voucher instead."</p>
+          <p class="q-meta">Cox &amp; Cox · ★1 · May 2026</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-label">Where the journey breaks</div>
+      <div class="flow-wrap">
+        <div class="f-step"><div class="f-box"><div class="f-num">1</div><div class="f-title">Item arrives wrong</div><div class="f-desc">Customer decides to return</div></div></div>
+        <div class="arrow"><svg viewBox="0 0 24 24" stroke-width="1.8"><path d="M5 12h14M13 6l6 6-6 6" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+        <div class="f-step"><div class="f-box pain"><div class="f-num">2</div><div class="f-title">How do I return?</div><div class="f-desc">No slip · email ignored · portal unclear</div></div></div>
+        <div class="arrow"><svg viewBox="0 0 24 24" stroke-width="1.8"><path d="M5 12h14M13 6l6 6-6 6" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+        <div class="f-step"><div class="f-box pain"><div class="f-num">3</div><div class="f-title">Getting a label</div><div class="f-desc">Days of chasing · hidden fees</div></div></div>
+        <div class="arrow"><svg viewBox="0 0 24 24" stroke-width="1.8"><path d="M5 12h14M13 6l6 6-6 6" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+        <div class="f-step"><div class="f-box"><div class="f-num">4</div><div class="f-title">Drop-off</div><div class="f-desc">Parcel sent back</div></div></div>
+        <div class="arrow"><svg viewBox="0 0 24 24" stroke-width="1.8"><path d="M5 12h14M13 6l6 6-6 6" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+        <div class="f-step"><div class="f-box pain"><div class="f-num">5</div><div class="f-title">Silence</div><div class="f-desc">No updates · refund delayed or denied</div></div></div>
+      </div>
+      <p class="flow-note">Highlighted steps = primary pain points identified in reviews</p>
+    </div>
+
+    <div class="card">
+      <div class="card-label">Stampfree-addressable targets</div>
+      <div class="opp-row">
+        <div class="opp-co">Rugette</div>
+        <div class="opp-issue">Asked 3× for return label, no reply. WhatsApp initiation + instant label generation removes this entirely.</div>
+        <div class="opp-tag tag-h">high fit</div>
+      </div>
+      <div class="opp-row">
+        <div class="opp-co">The Rugs</div>
+        <div class="opp-issue">Wrong item, told to repackage in machine-packed box — impossible. Guided chat removes the ambiguity.</div>
+        <div class="opp-tag tag-h">high fit</div>
+      </div>
+      <div class="opp-row">
+        <div class="opp-co">Homescapes</div>
+        <div class="opp-issue">No slip, long form, pay to return, no refund visibility. All three friction points directly addressable.</div>
+        <div class="opp-tag tag-h">high fit</div>
+      </div>
+      <div class="opp-row">
+        <div class="opp-co">Ruggable</div>
+        <div class="opp-issue">Label issued, item returned with tracking, refund never arrived. Post-drop-off status updates close the gap.</div>
+        <div class="opp-tag tag-m">process gap</div>
+      </div>
+      <div class="opp-row">
+        <div class="opp-co">Rugs Direct</div>
+        <div class="opp-issue">£20+ return fee with poor communication. Conversational channel reduces friction even where fees exist.</div>
+        <div class="opp-tag tag-m">process gap</div>
+      </div>
+    </div>
+
+    <div class="note" id="method-note">Apify scrape · memo23/trustpilot-scraper-ppe · 1–3 star reviews · 30-day window · Apr–May 2026 · 9 UK retailers</div>
+  </div>
+
+  <!-- TEMPLATE PANE -->
+  <div class="pane" id="pane-template">
+    <div class="pane-header">
+      <div>
+        <p class="pane-title">New audit template</p>
+        <p class="pane-sub">Follow these steps to replicate this report for a new scrape or sector</p>
+      </div>
+    </div>
+    <div class="template-wrap">
+      <div class="t-card">
+        <div class="t-step">Step 1</div>
+        <p class="t-title">Run the scraper</p>
+        <p class="t-desc">Update the company list in <code>trustpilot_scraper.py</code> and run. Output lands as a timestamped JSON in the same folder. Make sure <code>filterStars: ["1","2","3"]</code> is set as strings.</p>
+      </div>
+      <div class="t-card">
+        <div class="t-step">Step 2</div>
+        <p class="t-title">Add a new tab to this file</p>
+        <p class="t-desc">Duplicate the audit tab HTML block and paste it below. Rename the tab label and pane ID. Click "Refresh with new scrape" and drop in the new JSON — metrics and bar chart update automatically.</p>
+      </div>
+      <div class="t-card">
+        <div class="t-step">Step 3</div>
+        <p class="t-title">Update the editorial sections</p>
+        <p class="t-desc">The quotes and opportunities table need a manual review each run — the data surfaces the signal but the commentary needs your judgement. Update the pane subtitle and methodology note to reflect the new date range and company set.</p>
+      </div>
+      <div class="t-card">
+        <div class="t-step">Naming convention</div>
+        <p class="t-title">Keep tab names consistent</p>
+        <p class="t-desc">Suggested format for new tabs:</p>
+        <span class="t-tag">Trustpilot audit — [sector] — [Mon YYYY]</span>
+        <span class="t-tag">e.g. Trustpilot audit — furniture — Jun 2026</span>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+function switchTab(id) {
+  document.querySelectorAll('.tab').forEach((t, i) => {
+    t.classList.toggle('active', ['audit','template'][i] === id);
+  });
+  ['audit','template'].forEach(p => {
+    document.getElementById('pane-' + p).classList.toggle('active', p === id);
+  });
+}
+
+const RETURN_KW = ['return','refund','collection','send back','label','exchange'];
+const PROCESS_KW = ['label','instruction','how to return','portal','return process','permission','no reply','no response','repackage','organis'];
+const BU = {
+  '4be1fc29000064000508267a':'Cox & Cox','5e32bd85952a7600016e4973':'The Rugs',
+  '609c1455ad338c00019afcb8':'Ruggable','509c6cb200006400051e4c91':'Homescapes',
+  '5c85355bbbc0f20001f16a67':'Rugs Direct','669a38a897a240b236b5814e':'Rugette',
+  '5c9e7d3973bb4000010af6e1':'Natural Rug Store','5c90cba8c0170b0001e601a1':'Homescapes FR'
+};
+
+function analyse(reviews) {
+  const cos = {};
+  reviews.forEach(r => {
+    const co = r.company || 'Other';
+    if (!cos[co]) cos[co] = { returns:0, process:0 };
+    const t = ((r.text||'')+(r.title||'')).toLowerCase();
+    if (RETURN_KW.some(k => t.includes(k))) cos[co].returns++;
+    if (PROCESS_KW.some(k => t.includes(k))) cos[co].process++;
+  });
+  return cos;
+}
+
+function renderBars(cos) {
+  const sorted = Object.entries(cos).sort((a,b) => b[1].returns - a[1].returns).filter(([,v]) => v.returns > 0);
+  const maxR = Math.max(...sorted.map(([,v]) => v.returns), 1);
+  document.getElementById('bar-chart').innerHTML = sorted.map(([co,v]) => `
+    <div class="bar-row">
+      <div class="b-label" title="${co}">${co}</div>
+      <div class="b-track">
+        <div class="b-bar" style="width:${Math.round(v.returns/maxR*100)}%;background:#7F77DD;"></div>
+        <div class="b-bar" style="width:${Math.round(v.process/maxR*100)}%;background:#D85A30;"></div>
+      </div>
+      <div class="b-count">${v.returns}</div>
+    </div>`).join('');
+}
+
+function refresh(reviews) {
+  const cos = analyse(reviews);
+  const total = reviews.length;
+  const totalR = reviews.filter(r => RETURN_KW.some(k => ((r.text||'')+(r.title||'')).toLowerCase().includes(k))).length;
+  const totalP = reviews.filter(r => PROCESS_KW.some(k => ((r.text||'')+(r.title||'')).toLowerCase().includes(k))).length;
+  document.getElementById('m-total').textContent = total;
+  document.getElementById('m-companies').textContent = Object.keys(cos).length + ' retailers';
+  document.getElementById('m-returns').textContent = totalR;
+  document.getElementById('m-returns-pct').textContent = Math.round(totalR/total*100) + '% of all reviews';
+  document.getElementById('m-process').textContent = totalP;
+  renderBars(cos);
+  const dates = reviews.map(r => r.date).filter(Boolean).sort();
+  if (dates.length) {
+    const from = dates[0], to = dates[dates.length-1];
+    document.getElementById('dash-sub').textContent = 'Trustpilot · ' + Object.keys(cos).length + ' companies · 1–3 star · ' + from + ' → ' + to;
+    document.getElementById('method-note').textContent = 'Apify scrape · 1–3 star · ' + from + ' → ' + to + ' · ' + Object.keys(cos).length + ' UK retailers · ' + total + ' reviews';
+  }
+}
+
+document.getElementById('file-input').addEventListener('change', function(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = ev => {
+    try {
+      let data = JSON.parse(ev.target.result);
+      if (data.length && !data[0].company) {
+        data = data.map(r => ({
+          company: BU[r._mobileRaw?.businessUnitId] || 'Other',
+          rating: r.rating,
+          title: (r.title||'').slice(0,80),
+          text: (r.text||'').slice(0,300),
+          date: (r.dates?.publishedDate||'').slice(0,10),
+        }));
+      }
+      refresh(data);
+    } catch(err) { alert('Could not parse JSON file. Make sure it is a valid Apify scrape output.'); }
+  };
+  reader.readAsText(file);
+});
+
+// Seed data derived from actual scrape
+const SEED = [
+  {company:'Cox & Cox',rating:1,text:'return refund label exchange organis',date:'2026-05-10'},
+  {company:'Cox & Cox',rating:1,text:'return refund no reply label',date:'2026-05-11'},
+  {company:'Cox & Cox',rating:1,text:'return label refund delayed',date:'2026-05-12'},
+  {company:'Cox & Cox',rating:1,text:'refund promised no reply email ignored',date:'2026-05-13'},
+  {company:'Cox & Cox',rating:1,text:'return process organis no response',date:'2026-05-14'},
+  {company:'Cox & Cox',rating:1,text:'refund not received return label',date:'2026-05-15'},
+  {company:'Cox & Cox',rating:1,text:'collection failed refund exchange',date:'2026-05-16'},
+  {company:'Cox & Cox',rating:2,text:'refund delayed return slow',date:'2026-05-17'},
+  {company:'Cox & Cox',rating:1,text:'return refused refund exchange voucher instead',date:'2026-05-18'},
+  {company:'Cox & Cox',rating:1,text:'delivery issue no communication',date:'2026-05-05'},
+  {company:'Cox & Cox',rating:1,text:'delivery failed no updates',date:'2026-05-04'},
+  {company:'Cox & Cox',rating:1,text:'wrong item delivered no response',date:'2026-05-03'},
+  {company:'Cox & Cox',rating:1,text:'order not dispatched refund slow',date:'2026-05-02'},
+  {company:'Cox & Cox',rating:1,text:'delivery broken van excuse',date:'2026-04-28'},
+  {company:'Cox & Cox',rating:1,text:'item damaged refund chargeback',date:'2026-04-27'},
+  {company:'Cox & Cox',rating:1,text:'return permission required voucher offered',date:'2026-04-26'},
+  {company:'Cox & Cox',rating:1,text:'delivery no show refund',date:'2026-04-25'},
+  {company:'Cox & Cox',rating:1,text:'wrong bed twice no reply refund',date:'2026-04-24'},
+  {company:'Cox & Cox',rating:1,text:'delivery excuse refund requested',date:'2026-04-23'},
+  {company:'Cox & Cox',rating:1,text:'return organise label slow',date:'2026-04-22'},
+  {company:'Cox & Cox',rating:2,text:'delivery poor refund still waiting',date:'2026-04-22'},
+  {company:'Cox & Cox',rating:3,text:'delivery issue communication poor',date:'2026-04-22'},
+  {company:'Cox & Cox',rating:1,text:'delivery failed three times refund',date:'2026-04-22'},
+  {company:'Cox & Cox',rating:1,text:'no delivery refund needed',date:'2026-05-01'},
+  {company:'Cox & Cox',rating:1,text:'overcharged email ignored refund',date:'2026-05-18'},
+  {company:'Cox & Cox',rating:1,text:'delivery issue email no reply',date:'2026-04-29'},
+  {company:'Cox & Cox',rating:1,text:'quality faulty refund refused',date:'2026-05-01'},
+  {company:'Cox & Cox',rating:1,text:'dispatch never happened refund',date:'2026-04-28'},
+  {company:'Cox & Cox',rating:1,text:'item damaged concealed return organise',date:'2026-05-07'},
+  {company:'Cox & Cox',rating:1,text:'wrong item filthy return collection',date:'2026-05-07'},
+  {company:'Cox & Cox',rating:1,text:'order not received refund exchange',date:'2026-05-03'},
+  {company:'Cox & Cox',rating:1,text:'order wrong email no response refund',date:'2026-05-02'},
+  {company:'Cox & Cox',rating:1,text:'delivery missing no reply',date:'2026-04-30'},
+  {company:'Cox & Cox',rating:2,text:'delivery issue communication poor',date:'2026-04-20'},
+  {company:'Cox & Cox',rating:1,text:'delivery promised not arrived refund',date:'2026-04-29'},
+  {company:'Cox & Cox',rating:1,text:'product poor quality no refund',date:'2026-05-05'},
+  {company:'Cox & Cox',rating:1,text:'delivery slot missed again no call back',date:'2026-04-28'},
+  {company:'Cox & Cox',rating:2,text:'product nice delivery chaos refund partial',date:'2026-05-12'},
+  {company:'Cox & Cox',rating:1,text:'overcharged no response refund',date:'2026-05-17'},
+  {company:'Ruggable',rating:1,text:'return label sent refund not received',date:'2026-05-15'},
+  {company:'Ruggable',rating:2,text:'return charged fee refund process',date:'2026-05-05'},
+  {company:'Ruggable',rating:2,text:'return billing refund issues no humans',date:'2026-05-01'},
+  {company:'Ruggable',rating:2,text:'return process costs money',date:'2026-04-20'},
+  {company:'Ruggable',rating:3,text:'delivery slow no estimated date',date:'2026-05-16'},
+  {company:'Ruggable',rating:1,text:'arrived damaged oil',date:'2026-04-26'},
+  {company:'Ruggable',rating:2,text:'quality poor not as advertised return',date:'2026-04-21'},
+  {company:'Ruggable',rating:1,text:'tracking broken evri no update',date:'2026-04-20'},
+  {company:'Ruggable',rating:3,text:'quality not outstanding for price',date:'2026-04-26'},
+  {company:'Ruggable',rating:2,text:'quality poor return fee hidden',date:'2026-04-19'},
+  {company:'Ruggable',rating:2,text:'not worth price thin poor quality',date:'2026-04-19'},
+  {company:'The Rugs',rating:2,text:'quality poor sending it back return',date:'2026-05-17'},
+  {company:'The Rugs',rating:1,text:'quality outdoor rug poor',date:'2026-05-16'},
+  {company:'The Rugs',rating:1,text:'rug soaked decking expensive',date:'2026-05-15'},
+  {company:'The Rugs',rating:1,text:'quality flimsy poor',date:'2026-05-14'},
+  {company:'The Rugs',rating:3,text:'manufacturing flaw ridge',date:'2026-05-12'},
+  {company:'The Rugs',rating:3,text:'delivery slow evri',date:'2026-05-11'},
+  {company:'The Rugs',rating:1,text:'undelivered rug no update',date:'2026-05-09'},
+  {company:'The Rugs',rating:1,text:'AVOID return impossible repackage label refused refund',date:'2026-05-04'},
+  {company:'The Rugs',rating:2,text:'outdoor rug not worth money quality',date:'2026-05-07'},
+  {company:'The Rugs',rating:1,text:'delivery DX poor appalling return label',date:'2026-05-06'},
+  {company:'The Rugs',rating:2,text:'quality underwhelming compared images',date:'2026-04-19'},
+  {company:'Homescapes',rating:1,text:'collection refused refund not given no reply',date:'2026-05-08'},
+  {company:'Homescapes',rating:1,text:'stitching apart complaint dismissed',date:'2026-05-07'},
+  {company:'Homescapes',rating:3,text:'colour not as shown website',date:'2026-05-06'},
+  {company:'Homescapes',rating:1,text:'access denied no customer service',date:'2026-05-03'},
+  {company:'Homescapes',rating:1,text:'no delivery slip return form pay to return refund unknown',date:'2026-04-29'},
+  {company:'Homescapes',rating:3,text:'delivery dropped fence glass',date:'2026-04-25'},
+  {company:'Homescapes',rating:3,text:'product not expected flimsy',date:'2026-04-24'},
+  {company:'Homescapes',rating:1,text:'evri lost order no delivery',date:'2026-04-23'},
+  {company:'Homescapes',rating:1,text:'arnaque livraison jamais reçue',date:'2026-05-08'},
+  {company:'Rugs Direct',rating:1,text:'return charge £20 label poor communication DX',date:'2026-05-15'},
+  {company:'Rugs Direct',rating:2,text:'return cost £40 collection no email trail',date:'2026-04-27'},
+  {company:'Rugs Direct',rating:1,text:'quality threads loose emailed ignored',date:'2026-04-25'},
+  {company:'Rugs Direct',rating:1,text:'delivery late no update communication poor',date:'2026-04-29'},
+  {company:'Rugette',rating:1,text:'return label instructions asked 3 times no reply',date:'2026-05-13'},
+  {company:'Rugette',rating:1,text:'packaging poor stain on rug',date:'2026-05-18'},
+  {company:'Natural Rug Store',rating:1,text:'refuse return postage quality poor falling apart',date:'2026-05-13'},
+  {company:'Natural Rug Store',rating:1,text:'delivery not received new courier needed',date:'2026-05-05'},
+  {company:'Homescapes FR',rating:1,text:'arnaque livraison jamais reçue',date:'2026-05-08'},
+  {company:'Homescapes FR',rating:1,text:'arnaque site bidon aucune livraison',date:'2026-04-23'},
+  {company:'Other',rating:1,text:'scam wrong item delivered poor quality',date:'2026-04-25'},
+];
+
+refresh(SEED);
+</script>
+</body>
+</html>

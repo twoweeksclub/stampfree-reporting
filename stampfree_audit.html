@@ -1,0 +1,748 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Stampfree · Returns Audit</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Condensed:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --cyan: #4fdceb;
+  --purple: #4f02a5;
+  --purple-dark: #3a0178;
+  --bg: #ffffff;
+  --surface: #f7f6f3;
+  --surface2: #eeecea;
+  --border: rgba(0,0,0,0.09);
+  --border2: rgba(0,0,0,0.16);
+  --text: #111010;
+  --text2: #4a4846;
+  --text3: #9a9793;
+  --radius: 12px;
+  --radius-sm: 7px;
+}
+
+body {
+  font-family: 'IBM Plex Sans Condensed', sans-serif;
+  font-size: 15px;
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.5;
+  min-height: 100vh;
+}
+
+/* Logo bar */
+.logo-bar {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 14px;
+  padding: 0.6rem 0;
+  max-width: calc(880px - 4rem);
+  width: calc(100% - 4rem);
+  margin: 0.75rem auto 0;
+}
+.logo-bar-client {
+  height: 32px;
+  max-width: 140px;
+  object-fit: contain;
+  object-position: left center;
+}
+.logo-bar-divider {
+  width: 1px;
+  height: 26px;
+  background: var(--border2);
+}
+.logo-bar-stampfree {
+  height: 20px;
+  object-fit: contain;
+}
+
+/* NAV */
+.nav {
+  display: flex;
+  align-items: center;
+  padding: 13px 2rem;
+  border-bottom: 1px solid var(--border);
+  background: #fff;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+.nav-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 13px 0;
+  margin-right: 2rem;
+  padding-right: 2rem;
+  border-right: 1px solid var(--border);
+  flex-shrink: 0;
+}
+.nav-brand img { width: 26px; height: 26px; object-fit: contain; }
+.nav-brand-text { font-size: 13px; font-weight: 500; color: var(--text); }
+.nav-label {
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text3);
+  margin-right: auto;
+}
+.nav-logos {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-left: auto;
+}
+.nav-client-logo {
+  height: 28px;
+  max-width: 120px;
+  object-fit: contain;
+  object-position: left center;
+}
+.nav-divider-v {
+  width: 1px;
+  height: 22px;
+  background: var(--border2);
+}
+.nav-email-logo {
+  height: 18px;
+  object-fit: contain;
+}
+.nav-tabs { display: flex; }
+.nav-tab {
+  font-size: 13px;
+  padding: 16px 18px;
+  cursor: pointer;
+  color: var(--text2);
+  border-bottom: 2px solid transparent;
+  transition: color 0.15s;
+  white-space: nowrap;
+  user-select: none;
+}
+.nav-tab:hover { color: var(--text); }
+.nav-tab.active {
+  color: var(--purple);
+  border-bottom-color: var(--purple);
+  font-weight: 500;
+}
+
+/* PANE */
+.pane { display: none; }
+.pane.active { display: block; }
+
+/* HERO */
+.hero {
+  background: #4fdceb;
+  border-radius: var(--radius);
+  max-width: calc(880px - 4rem);
+  width: calc(100% - 4rem);
+  margin: 0.4rem auto 0;
+  padding: 0;
+  position: relative;
+  overflow: hidden;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  min-height: 110px;
+}
+.hero-content {
+  padding: 1.2rem 1.5rem;
+  position: relative;
+  z-index: 1;
+}
+.hero-top {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+.hero-client-logo {
+  height: 36px;
+  max-width: 160px;
+  object-fit: contain;
+  object-position: left center;
+}
+.hero-divider {
+  width: 1px;
+  height: 28px;
+  background: rgba(0,0,0,0.15);
+}
+.hero-presented-logo {
+  height: 22px;
+  object-fit: contain;
+  opacity: 1;
+}
+.hero-eyebrow {
+  font-size: 36px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  text-transform: uppercase;
+  color: var(--purple-dark);
+  margin-bottom: 10px;
+  line-height: 1;
+}
+.hero-sub {
+  font-size: 17px;
+  color: rgba(0,0,0,0.6);
+  max-width: 500px;
+  line-height: 1.6;
+}
+.hero-right {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  position: relative;
+  z-index: 1;
+}
+.hero-motif {
+  width: 200px;
+  height: 100%;
+  object-fit: cover;
+  object-position: left center;
+  opacity: 1;
+}
+.hero-badge {
+  position: absolute;
+  bottom: 2rem;
+  right: 2rem;
+  background: rgba(79,2,165,0.06);
+  border: 1px solid rgba(79,2,165,0.2);
+  border-radius: 8px;
+  padding: 12px 18px;
+  text-align: center;
+}
+.hero-badge-val {
+  font-family: 'IBM Plex Sans Condensed', sans-serif;
+  font-size: 26px;
+  color: var(--purple);
+  line-height: 1;
+  margin-bottom: 3px;
+}
+.hero-badge-label {
+  font-size: 11px;
+  color: var(--text3);
+  line-height: 1.3;
+}
+
+/* CONTENT */
+.content {
+  max-width: 880px;
+  margin: 0 auto;
+  padding: 1.25rem 2rem 5rem;
+}
+
+.section-label {
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--purple);
+  margin-bottom: 14px;
+}
+
+/* Stats */
+.stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  margin-bottom: 1.75rem;
+}
+.stat {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 16px 18px;
+}
+.stat-val {
+  font-family: 'IBM Plex Sans Condensed', sans-serif;
+  font-size: 24px;
+  color: var(--purple);
+  line-height: 1;
+  margin-bottom: 6px;
+}
+.stat-label {
+  font-size: 12px;
+  color: var(--text2);
+  line-height: 1.4;
+}
+
+/* Two col */
+.two-col {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+  margin-bottom: 14px;
+  align-items: start;
+}
+
+/* Card */
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 1.25rem 1.4rem;
+  margin-bottom: 14px;
+}
+.card:last-child { margin-bottom: 0; }
+
+/* Quotes */
+.q-block {
+  border-left: 2px solid var(--purple);
+  padding: 8px 14px;
+  margin-bottom: 12px;
+}
+.q-block:last-child { margin-bottom: 0; }
+.q-text {
+  font-family: 'IBM Plex Sans Condensed', sans-serif;
+  font-style: italic;
+  font-size: 14px;
+  color: var(--text);
+  line-height: 1.55;
+  margin-bottom: 5px;
+}
+.q-meta { font-size: 11px; color: var(--text3); }
+
+/* Journey */
+.flow-wrap { display: flex; align-items: stretch; gap: 0; margin-bottom: 8px; }
+.f-step { flex: 1; }
+.f-box {
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 10px;
+  background: #fff;
+  height: 100%;
+}
+.f-box.pain {
+  background: rgba(79,2,165,0.06);
+  border-color: rgba(79,2,165,0.25);
+}
+.f-num { font-size: 10px; color: var(--text3); margin-bottom: 3px; }
+.f-title { font-size: 12px; font-weight: 500; color: var(--text); margin-bottom: 3px; line-height: 1.3; }
+.f-desc { font-size: 11px; color: var(--text2); line-height: 1.4; }
+.pain .f-title { color: var(--purple); }
+.pain .f-desc { color: rgba(79,2,165,0.65); }
+.f-arr {
+  display: flex;
+  align-items: center;
+  padding: 0 4px;
+  color: var(--text3);
+  flex-shrink: 0;
+}
+.f-arr svg { width: 13px; height: 13px; stroke: #ccc; fill: none; }
+.flow-note { font-size: 11px; color: var(--text3); margin-top: 8px; }
+
+/* Fix box */
+.fix-box {
+  background: linear-gradient(135deg, rgba(79,2,165,0.06) 0%, rgba(79,220,235,0.08) 100%);
+  border: 1px solid rgba(79,2,165,0.2);
+  border-radius: var(--radius);
+  padding: 1.4rem;
+  margin-bottom: 14px;
+}
+.fix-title {
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--purple);
+  margin-bottom: 10px;
+}
+.fix-text {
+  font-size: 14px;
+  color: var(--text);
+  line-height: 1.7;
+}
+
+/* Stock image */
+.stock-wrap {
+  border-radius: var(--radius);
+  overflow: hidden;
+  height: 100%;
+  order: -1;
+}
+.stock-wrap img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* Fix + asset centred block */
+.fix-asset-wrap {
+  margin-bottom: 14px;
+  display: flex;
+  justify-content: center;
+}
+.fix-asset-wrap .asset-wrap {
+  max-width: 600px;
+  width: 100%;
+}
+.fix-asset-wrap .asset-wrap img {
+  width: 100%;
+  display: block;
+}
+
+/* Asset */
+.asset-wrap {
+  border-radius: var(--radius);
+  overflow: hidden;
+
+}
+.asset-wrap img {
+  width: 100%;
+  display: block;
+}
+
+/* CTA */
+.cta {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 2rem 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+  margin-top: 2rem;
+}
+.cta-text {
+  font-family: 'IBM Plex Sans Condensed', sans-serif;
+  font-size: 20px;
+  color: var(--text);
+  line-height: 1.3;
+}
+.cta-sub {
+  font-size: 13px;
+  color: var(--text3);
+  margin-top: 5px;
+}
+.cta-btn {
+  background: var(--cyan);
+  color: #0a0014;
+  font-family: 'IBM Plex Sans Condensed', sans-serif;
+  font-size: 13px;
+  font-weight: 500;
+  padding: 12px 26px;
+  border-radius: var(--radius-sm);
+  text-decoration: none;
+  white-space: nowrap;
+  flex-shrink: 0;
+  display: inline-block;
+}
+
+/* Footer */
+.footer {
+  border-top: 1px solid var(--border);
+  padding: 1.25rem 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  background: #fff;
+}
+.footer-brand { display: flex; align-items: center; gap: 8px; }
+.footer-brand img { width: 18px; height: 18px; object-fit: contain; }
+.footer-text { font-size: 12px; color: var(--text3); }
+</style>
+</head>
+<body>
+<nav style="display:flex;align-items:center;gap:0;padding:0 2rem;background:#fff;border-bottom:1px solid rgba(0,0,0,0.09);font-family:'IBM Plex Sans Condensed',sans-serif;font-size:13px;">
+  <span style="font-weight:500;color:#111010;padding:14px 20px 14px 0;margin-right:8px;border-right:1px solid rgba(0,0,0,0.09);">stampfree.ai</span>
+  <a href="stampfree_reporting.html" style="padding:14px 16px;color:#4a4846;text-decoration:none;border-bottom:2px solid transparent;">Reporting</a>
+  <a href="stampfree_audit.html" style="padding:14px 16px;color:#4f02a5;text-decoration:none;border-bottom:2px solid #4f02a5;font-weight:500;">Audit</a>
+</nav>
+
+<div class="logo-bar">
+  <img class="logo-bar-client" src="images/rugette-logo-tsp.png" alt="Client logo">
+  <div class="logo-bar-divider"></div>
+  <img class="logo-bar-stampfree" src="images/stampfree-email-logo.png" alt="Stampfree">
+</div>
+
+<div class="pane active" id="pane-rugette">
+
+  <div class="hero">
+    <div class="hero-content">
+      <p class="hero-eyebrow">Returns pain audit · rugette.co.uk</p>
+      <p class="hero-sub">Customers asking 3× for return labels with no reply. No returns communication process exists.</p>
+    </div>
+    <div class="hero-right">
+      <img class="hero-motif" src="images/stampfree-image.png" alt="">
+    </div>
+  </div>
+
+  <div class="content">
+
+    <div class="stats">
+      <div class="stat">
+        <div class="stat-val">2 of 2</div>
+        <div class="stat-label">recent reviews mention returns friction</div>
+      </div>
+      <div class="stat">
+        <div class="stat-val">3+</div>
+        <div class="stat-label">contact attempts before any resolution</div>
+      </div>
+      <div class="stat">
+        <div class="stat-val">0</div>
+        <div class="stat-label">automated return initiation in place</div>
+      </div>
+    </div>
+
+    <div class="two-col">
+      <div class="card" style="margin-bottom:0;">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:14px;">
+          <p class="section-label" style="margin-bottom:0;">What their customers say</p>
+          <img src="images/trustpilot-logo.png" alt="Trustpilot" style="height:16px;object-fit:contain;">
+        </div>
+        <div class="q-block">
+          <p class="q-text">"I have asked 3 times for instructions and a label with no reply. Poor Customer Service."</p>
+          <p class="q-meta">★1 · Trustpilot · May 2026</p>
+        </div>
+        <div class="q-block">
+          <p class="q-text">"Poor packaging and shipping. Rugs came folded up with red stains on a white rug ordered. They asked if I could wipe it off!"</p>
+          <p class="q-meta">★1 · Trustpilot · May 2026</p>
+        </div>
+      </div>
+      <div class="stock-wrap" style="margin-bottom:0;">
+        <img src="images/stampfree-stock-image.png" alt="Customer using appfree on phone">
+      </div>
+    </div>
+
+    <div class="card">
+      <p class="section-label">Where the returns journey breaks today</p>
+      <div class="flow-wrap">
+        <div class="f-step"><div class="f-box"><div class="f-num">1</div><div class="f-title">Wrong item arrives</div><div class="f-desc">Customer wants to return</div></div></div>
+        <div class="f-arr"><svg viewBox="0 0 24 24" stroke-width="1.8"><path d="M5 12h14M13 6l6 6-6 6" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+        <div class="f-step"><div class="f-box pain"><div class="f-num">2</div><div class="f-title">No instructions</div><div class="f-desc">No slip · email ignored</div></div></div>
+        <div class="f-arr"><svg viewBox="0 0 24 24" stroke-width="1.8"><path d="M5 12h14M13 6l6 6-6 6" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+        <div class="f-step"><div class="f-box pain"><div class="f-num">3</div><div class="f-title">Chasing a label</div><div class="f-desc">Days of waiting · fees</div></div></div>
+        <div class="f-arr"><svg viewBox="0 0 24 24" stroke-width="1.8"><path d="M5 12h14M13 6l6 6-6 6" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+        <div class="f-step"><div class="f-box"><div class="f-num">4</div><div class="f-title">Drop-off</div><div class="f-desc">Parcel sent back</div></div></div>
+        <div class="f-arr"><svg viewBox="0 0 24 24" stroke-width="1.8"><path d="M5 12h14M13 6l6 6-6 6" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+        <div class="f-step"><div class="f-box pain"><div class="f-num">5</div><div class="f-title">Silence</div><div class="f-desc">No updates · refund delayed</div></div></div>
+      </div>
+      <p class="flow-note">Highlighted steps = primary friction points identified from Trustpilot reviews</p>
+    </div>
+
+    <div class="fix-asset-wrap">
+      <div class="asset-wrap">
+        <img src="images/stampfree-cards.png" alt="appfree product stats">
+      </div>
+    </div>
+
+    <div class="cta">
+      <div>
+        <p class="cta-text">See appfree working for Rugette</p>
+        <p class="cta-sub">Book a 20-minute live demo · no commitment required</p>
+      </div>
+      <a class="cta-btn" href="mailto:hello@stampfree.ai">Book a demo →</a>
+    </div>
+
+  </div>
+
+  <div class="footer">
+    <div class="footer-brand">
+      <img src="images/stampfree-logo.png" alt="Stampfree">
+      <span class="footer-text">stampfree.ai · hello@stampfree.ai</span>
+    </div>
+    <span class="footer-text">Source: Trustpilot · 1–3 star reviews · Apr–May 2026</span>
+  </div>
+
+</div>
+
+<div class="pane " id="pane-therugs">
+
+  <div class="hero">
+    <div class="hero-content">
+      <p class="hero-eyebrow">Returns pain audit · the-rugs.com</p>
+      <p class="hero-sub">Customers told to repackage in original machine-packed boxes — physically impossible. Returns refused on this basis, leading to 1-star reviews.</p>
+    </div>
+    <div class="hero-right">
+      <img class="hero-motif" src="images/stampfree-image.png" alt="">
+    </div>
+  </div>
+
+  <div class="content">
+
+    <div class="stats">
+      <div class="stat">
+        <div class="stat-val">1 of 11</div>
+        <div class="stat-label">reviews cite returns process as the complaint</div>
+      </div>
+      <div class="stat">
+        <div class="stat-val">Impossible</div>
+        <div class="stat-label">repackaging demand cited by customers</div>
+      </div>
+      <div class="stat">
+        <div class="stat-val">£0</div>
+        <div class="stat-label">return postage covered for wrong items</div>
+      </div>
+    </div>
+
+    <div class="two-col">
+      <div class="card" style="margin-bottom:0;">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:14px;">
+          <p class="section-label" style="margin-bottom:0;">What their customers say</p>
+          <img src="images/trustpilot-logo.png" alt="Trustpilot" style="height:16px;object-fit:contain;">
+        </div>
+        <div class="q-block">
+          <p class="q-text">"It was impossible to put the rug back in its original packaging. They know people will struggle to do this, then refuse to offer a refund. Absolutely unacceptable."</p>
+          <p class="q-meta">★1 · Trustpilot · May 2026</p>
+        </div>
+        <div class="q-block">
+          <p class="q-text">"The perfect rug design but unfortunately not impressed with the quality — we will be sending it back."</p>
+          <p class="q-meta">★2 · Trustpilot · May 2026</p>
+        </div>
+      </div>
+      <div class="stock-wrap" style="margin-bottom:0;">
+        <img src="images/stampfree-stock-image.png" alt="Customer using appfree on phone">
+      </div>
+    </div>
+
+    <div class="card">
+      <p class="section-label">Where the returns journey breaks today</p>
+      <div class="flow-wrap">
+        <div class="f-step"><div class="f-box"><div class="f-num">1</div><div class="f-title">Wrong item arrives</div><div class="f-desc">Customer wants to return</div></div></div>
+        <div class="f-arr"><svg viewBox="0 0 24 24" stroke-width="1.8"><path d="M5 12h14M13 6l6 6-6 6" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+        <div class="f-step"><div class="f-box pain"><div class="f-num">2</div><div class="f-title">No instructions</div><div class="f-desc">No slip · email ignored</div></div></div>
+        <div class="f-arr"><svg viewBox="0 0 24 24" stroke-width="1.8"><path d="M5 12h14M13 6l6 6-6 6" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+        <div class="f-step"><div class="f-box pain"><div class="f-num">3</div><div class="f-title">Chasing a label</div><div class="f-desc">Days of waiting · fees</div></div></div>
+        <div class="f-arr"><svg viewBox="0 0 24 24" stroke-width="1.8"><path d="M5 12h14M13 6l6 6-6 6" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+        <div class="f-step"><div class="f-box"><div class="f-num">4</div><div class="f-title">Drop-off</div><div class="f-desc">Parcel sent back</div></div></div>
+        <div class="f-arr"><svg viewBox="0 0 24 24" stroke-width="1.8"><path d="M5 12h14M13 6l6 6-6 6" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+        <div class="f-step"><div class="f-box pain"><div class="f-num">5</div><div class="f-title">Silence</div><div class="f-desc">No updates · refund delayed</div></div></div>
+      </div>
+      <p class="flow-note">Highlighted steps = primary friction points identified from Trustpilot reviews</p>
+    </div>
+
+    <div class="fix-asset-wrap">
+      <div class="asset-wrap">
+        <img src="images/stampfree-cards.png" alt="appfree product stats">
+      </div>
+    </div>
+
+    <div class="cta">
+      <div>
+        <p class="cta-text">See appfree working for The Rugs</p>
+        <p class="cta-sub">Book a 20-minute live demo · no commitment required</p>
+      </div>
+      <a class="cta-btn" href="mailto:hello@stampfree.ai">Book a demo →</a>
+    </div>
+
+  </div>
+
+  <div class="footer">
+    <div class="footer-brand">
+      <img src="images/stampfree-logo.png" alt="Stampfree">
+      <span class="footer-text">stampfree.ai · hello@stampfree.ai</span>
+    </div>
+    <span class="footer-text">Source: Trustpilot · 1–3 star reviews · Apr–May 2026</span>
+  </div>
+
+</div>
+
+<div class="pane " id="pane-homescapes">
+
+  <div class="hero">
+    <div class="hero-content">
+      <p class="hero-eyebrow">Returns pain audit · homescapes-online.com</p>
+      <p class="hero-sub">No delivery slip, a long online form to find and fill, customers paying for their own return postage — with zero visibility on whether a refund will ever arrive.</p>
+    </div>
+    <div class="hero-right">
+      <img class="hero-motif" src="images/stampfree-image.png" alt="">
+    </div>
+  </div>
+
+  <div class="content">
+
+    <div class="stats">
+      <div class="stat">
+        <div class="stat-val">2 of 9</div>
+        <div class="stat-label">recent reviews mention returns or collection failure</div>
+      </div>
+      <div class="stat">
+        <div class="stat-val">No slip</div>
+        <div class="stat-label">included in delivery box — customers left to search</div>
+      </div>
+      <div class="stat">
+        <div class="stat-val">Pay to return</div>
+        <div class="stat-label">even for wrong-colour items received</div>
+      </div>
+    </div>
+
+    <div class="two-col">
+      <div class="card" style="margin-bottom:0;">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:14px;">
+          <p class="section-label" style="margin-bottom:0;">What their customers say</p>
+          <img src="images/trustpilot-logo.png" alt="Trustpilot" style="height:16px;object-fit:contain;">
+        </div>
+        <div class="q-block">
+          <p class="q-text">"No delivery slip — had to ask how to return. Fill in long form and PAY TO RETURN. No idea whether I will get a refund."</p>
+          <p class="q-meta">★1 · Trustpilot · Apr 2026</p>
+        </div>
+        <div class="q-block">
+          <p class="q-text">"Failure to organise promised collection and refund not given. I have disabilities. I received no help at all from this company."</p>
+          <p class="q-meta">★1 · Trustpilot · May 2026</p>
+        </div>
+      </div>
+      <div class="stock-wrap" style="margin-bottom:0;">
+        <img src="images/stampfree-stock-image.png" alt="Customer using appfree on phone">
+      </div>
+    </div>
+
+    <div class="card">
+      <p class="section-label">Where the returns journey breaks today</p>
+      <div class="flow-wrap">
+        <div class="f-step"><div class="f-box"><div class="f-num">1</div><div class="f-title">Wrong item arrives</div><div class="f-desc">Customer wants to return</div></div></div>
+        <div class="f-arr"><svg viewBox="0 0 24 24" stroke-width="1.8"><path d="M5 12h14M13 6l6 6-6 6" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+        <div class="f-step"><div class="f-box pain"><div class="f-num">2</div><div class="f-title">No instructions</div><div class="f-desc">No slip · email ignored</div></div></div>
+        <div class="f-arr"><svg viewBox="0 0 24 24" stroke-width="1.8"><path d="M5 12h14M13 6l6 6-6 6" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+        <div class="f-step"><div class="f-box pain"><div class="f-num">3</div><div class="f-title">Chasing a label</div><div class="f-desc">Days of waiting · fees</div></div></div>
+        <div class="f-arr"><svg viewBox="0 0 24 24" stroke-width="1.8"><path d="M5 12h14M13 6l6 6-6 6" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+        <div class="f-step"><div class="f-box"><div class="f-num">4</div><div class="f-title">Drop-off</div><div class="f-desc">Parcel sent back</div></div></div>
+        <div class="f-arr"><svg viewBox="0 0 24 24" stroke-width="1.8"><path d="M5 12h14M13 6l6 6-6 6" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+        <div class="f-step"><div class="f-box pain"><div class="f-num">5</div><div class="f-title">Silence</div><div class="f-desc">No updates · refund delayed</div></div></div>
+      </div>
+      <p class="flow-note">Highlighted steps = primary friction points identified from Trustpilot reviews</p>
+    </div>
+
+    <div class="fix-asset-wrap">
+      <div class="asset-wrap">
+        <img src="images/stampfree-cards.png" alt="appfree product stats">
+      </div>
+    </div>
+
+    <div class="cta">
+      <div>
+        <p class="cta-text">See appfree working for Homescapes</p>
+        <p class="cta-sub">Book a 20-minute live demo · no commitment required</p>
+      </div>
+      <a class="cta-btn" href="mailto:hello@stampfree.ai">Book a demo →</a>
+    </div>
+
+  </div>
+
+  <div class="footer">
+    <div class="footer-brand">
+      <img src="images/stampfree-logo.png" alt="Stampfree">
+      <span class="footer-text">stampfree.ai · hello@stampfree.ai</span>
+    </div>
+    <span class="footer-text">Source: Trustpilot · 1–3 star reviews · Apr–May 2026</span>
+  </div>
+
+</div>
+
+<script>
+function switchTab(id) {
+  document.querySelectorAll('.pane').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('pane-' + id).classList.add('active');
+  document.getElementById('tab-' + id).classList.add('active');
+}
+document.getElementById('tab-rugette').classList.add('active');
+</script>
+</body>
+</html>
+
