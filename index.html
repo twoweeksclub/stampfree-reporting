@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Stampfree · Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Condensed:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --cyan: #4fdceb;
+  --purple: #4f02a5;
+  --purple-light: #f3eeff;
+  --bg: #f7f6f3;
+  --surface: #ffffff;
+  --border: rgba(0,0,0,0.10);
+  --border2: rgba(0,0,0,0.18);
+  --text: #1a1918;
+  --text2: #5a5753;
+  --text3: #9a9793;
+  --radius: 12px;
+}
+
+body {
+  font-family: 'IBM Plex Sans Condensed', sans-serif;
+  font-size: 15px;
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.5;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+}
+
+.container {
+  max-width: 520px;
+  width: 100%;
+}
+
+.logo-wrap {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 2.5rem;
+}
+
+.logo-wrap img {
+  height: 36px;
+  object-fit: contain;
+}
+
+.divider {
+  width: 1px;
+  height: 28px;
+  background: var(--border2);
+}
+
+.logo-label {
+  font-size: 13px;
+  color: var(--text3);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+h1 {
+  font-size: 26px;
+  font-weight: 500;
+  margin-bottom: 0.4rem;
+}
+
+.subtitle {
+  color: var(--text2);
+  margin-bottom: 2.5rem;
+  font-size: 15px;
+}
+
+.cards {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 1.25rem 1.5rem;
+  text-decoration: none;
+  color: inherit;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+
+.card:hover {
+  border-color: var(--purple);
+  box-shadow: 0 0 0 3px rgba(79,2,165,0.07);
+}
+
+.card-title {
+  font-size: 16px;
+  font-weight: 500;
+  margin-bottom: 0.2rem;
+}
+
+.card-desc {
+  font-size: 13px;
+  color: var(--text3);
+}
+
+.card-arrow {
+  font-size: 20px;
+  color: var(--text3);
+  flex-shrink: 0;
+  margin-left: 1rem;
+}
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="logo-wrap">
+    <img src="images/stampfree-logo.png" alt="Stampfree">
+    <div class="divider"></div>
+    <span class="logo-label">Analytics</span>
+  </div>
+
+  <h1>Trustpilot Dashboard</h1>
+  <p class="subtitle">Select a report to view</p>
+
+  <div class="cards">
+    <a class="card" href="stampfree_reporting.html">
+      <div>
+        <div class="card-title">Reporting</div>
+        <div class="card-desc">Review performance metrics and Trustpilot summary</div>
+      </div>
+      <span class="card-arrow">→</span>
+    </a>
+    <a class="card" href="stampfree_audit.html">
+      <div>
+        <div class="card-title">Returns Audit</div>
+        <div class="card-desc">Detailed review audit filtered for returns mentions</div>
+      </div>
+      <span class="card-arrow">→</span>
+    </a>
+  </div>
+</div>
+</body>
+</html>
